@@ -44,7 +44,6 @@ def extract_msd(path, temp):
     y = np.array([])
     x = np.array([])
     file_name = '{}/arkr-simulation-{:d}/analysis/msd.xvg'.format(path, temp)
-    # ksajd
     with open(file_name) as f:
         for line in itertools.islice(f, 21, None):
             time = float(re.findall('\d+\.\d+|\d+', line)[0])
