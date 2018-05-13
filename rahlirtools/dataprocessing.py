@@ -11,12 +11,15 @@ def extract_numbers(text_file, identifier, columns=None):
         for line in fnm:
             if identifier in line:
                 labels = line.split()
-                data = np.genfromtxt(fnm, invalid_raise=False, usecols=columns)
+                print(labels)
                 break
         else:
             raise ValueError("{} not found in the file {}".format(identifier, text_file))
+        data = np.genfromtxt(fnm, usecols=columns, invalid_raise=False)
 
-    return labels, data
+    # ~ is a shorthand for numpy.logical_not
+    data = data[~np.isnan(data).any(axis=1)]
+    return labels, data.T
 
 # def pretty_plot(x, y, title):
 #     plt.figure()
