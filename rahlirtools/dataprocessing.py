@@ -1,8 +1,9 @@
 """Useful tools"""
 
 import numpy as np
-import matplotlib.pyplot as plt
-from cycler import cycler
+# import matplotlib.pyplot as plt
+# from cycler import cycler
+
 
 def extract_numbers(text_file, identifier, columns=None):
     """Extract numbers from a text file"""
@@ -14,7 +15,8 @@ def extract_numbers(text_file, identifier, columns=None):
                 print(labels)
                 break
         else:
-            raise ValueError("{} not found in the file {}".format(identifier, text_file))
+            raise ValueError("{} not found \
+                    in the file {}".format(identifier, text_file))
         data = np.genfromtxt(fnm, usecols=columns, invalid_raise=False)
 
     # ~ is a shorthand for numpy.logical_not
@@ -24,8 +26,9 @@ def extract_numbers(text_file, identifier, columns=None):
 # def pretty_plot(x, y, title):
 #     plt.figure()
 #     plt.rc('lines', linewidth=1.5)
-#     plt.rc('axes', prop_cycler=cycler('color', ['k', 'b', 'r', 'g', 'm', 'c', 'y']))
-# 
+#     plt.rc('axes', prop_cycler=cycler('color',
+#           ['k', 'b', 'r', 'g', 'm', 'c', 'y']))
+#
 #     if isinstance(y, dict) and len(y) > 1:
 #         if len(x.shape) == 1:
 #             x = np.tile(x, (len(y), 1))
