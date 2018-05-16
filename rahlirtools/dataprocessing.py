@@ -1,5 +1,6 @@
 """Useful tools"""
 
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 # from cycler import cycler
@@ -12,16 +13,21 @@ def extract_numbers(text_file, identifier, columns=None):
         for line in fnm:
             if identifier in line:
                 labels = line.split()
-                print(labels)
                 break
         else:
             raise ValueError("{} not found \
                     in the file {}".format(identifier, text_file))
-        data = np.genfromtxt(fnm, usecols=columns, invalid_raise=False)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            data = np.genfromtxt(fnm, usecols=columns, invalid_raise=False)
 
     # ~ is a shorthand for numpy.logical_not
-    data = data[~np.isnan(data).any(axis=1)]
-    return labels, data.T
+    data = data[~np.isnan(data).any(axis=1)].T
+
+    result = {label: data[i].copy() for i, label in enumerate(labels)}
+    return result
+
 
 def pretty_plot(x, y, title):
     labels = False
@@ -49,6 +55,7 @@ def pretty_plot(x, y, title):
     plt.title(title, fontweight='bold', fontsize=14)
     if labels:
         plt.legend()
+
 
 def __plot_2d(x, y, labels=False):
     if len(x.shape) == 1:
