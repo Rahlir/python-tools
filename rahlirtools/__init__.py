@@ -2,5 +2,5 @@
 Initializing file for package rahlirtools
 """
 
-from rahlirtools.dataprocessing import extract_numbers
-from rahlirtools.dataprocessing import pretty_plot
+from .dataprocessing import extract_numbers
+from .dataprocessing import pretty_plot
