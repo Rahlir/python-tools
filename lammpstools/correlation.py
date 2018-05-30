@@ -7,44 +7,33 @@ import mdtraj as md
 
 def msd(trajectory, top, chunks=100, atoms='all'):
     """
-    Returns histogram in time of positions in z-coordinate from given trajectory
-    TODO: Is there need for centers?
+    Calculate MSD for given trajectory
     """
-    traj_top = md.load(top)
-    topology = traj_top.topology
-    traj = md.iterload(trajectory, top=topology, chunk=chunks)
+    print("Loading trajectories from {:s}".format(trajectory))
+    traj = md.load(trajectory, top=top)
+    assert isinstance(traj, md.Trajectory)
+    print("Trajectory loaded")
 
     if atoms != 'all':
         atoms = 'name ' + atoms
 
-    indicies = topology.select(atoms)
+    indicies = traj.topology.select(atoms)
 
     if indicies.size == 0:
         raise ValueError('No atoms with {:s}'.format(atoms))
 
-    init = False
+    n_contribs = np.zeros((traj.n_frames,), dtype=np.float64)
+    correlation = np.zeros((traj.n_frames,), dtype=np.float64)
+    origins = np.arange(0, traj.n_frames, 100)
 
-    fmt_progress = '\rframe = {:d} | {:.3f} ms / frame'
-    i_frame = 0
-    time_0 = time.time()
-    msds = []
-    for chunk in traj:
-        if not init:
-            ref = chunk.xyz[0, :, :]
+    for origin in origins:
+        ref = traj.xyz[origin, indicies, :]
+        msd_contr = (traj.xyz[origin:, indicies, :] - ref)**2
+        msd_contr_tot = np.mean(msd_contr, axis=1).sum(axis=1)
+        n_contribs[:msd_contr_tot.shape[0]] += 1
+        msd_contr_tot.resize((correlation.shape))
+        correlation += msd_contr_tot
 
-        msd_ind = (chunk.xyz - ref)**2
-        msd = np.mean(msd_ind, axis=1).sum(axis=1)
-        msds.append(msd)
-
-
-        time_1 = time.time()
-        print(fmt_progress.format(i_frame, 1000 * (time_1 - time_0) / len(chunk)),
-              flush=True, end='')
-        time_0 = time_1
-        i_frame += chunks
-
-    print()
-
-    result = np.array(msds)
+    result = correlation/n_contribs
 
     return result
