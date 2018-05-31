@@ -16,10 +16,13 @@ def msd(traj, atoms='all', average=False):
     """
     Calculate MSD for given trajectory object (mdtraj.Trajectory)
     """
+    assert isinstance(traj, md.Trajectory)
     if atoms != 'all':
         atoms = 'name ' + atoms
 
     indicies = traj.topology.select(atoms)
+
+    dt = traj.timestep
 
     if indicies.size == 0:
         raise ValueError('No atoms with {:s}'.format(atoms))
@@ -40,7 +43,9 @@ def msd(traj, atoms='all', average=False):
     n_contribs_new = np.tile(n_contribs, (correlation.shape[1], 1)).T
     result = correlation/n_contribs_new
 
-    if average:
-        return np.mean(result, axis=1)
+    x_axis = np.linspace(dt, traj.n_frames-1, result.shape[0])
 
-    return result
+    if average:
+        return x_axis, np.mean(result, axis=1)
+
+    return x_axis, result
