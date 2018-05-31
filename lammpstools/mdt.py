@@ -5,6 +5,16 @@ import matplotlib.cm as cm
 import mdtraj as md
 
 
+def load_traj(trajectory, top):
+    """
+    Calculate MSD for given trajectory
+    """
+    print("Loading trajectories from {:s}".format(trajectory), flush=True)
+    traj = md.load(trajectory, top=top)
+    print("Trajectory loaded")
+    return traj
+
+
 def msd(trajectory, top, chunks=100, atoms='all'):
     """
     Calculate MSD for given trajectory
