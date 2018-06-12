@@ -11,8 +11,8 @@ import mdtraj as md
 
 def density_hist(trajectory, top, chunks=100, atoms='all'):
     """
-    Returns histogram in time of positions in z-coordinate from given trajectory
-    TODO: Is there need for centers?
+    Returns histogram in time of positions in z-coordinate from given
+    trajectory TODO: Is there need for centers?
     """
     traj_top = md.load(top)
     topology = traj_top.topology
@@ -45,28 +45,32 @@ def density_hist(trajectory, top, chunks=100, atoms='all'):
         i_frame += chunks
 
     print()
-    
+
     result = np.array(hists)
 
     return centers, result
 
 
-def plot_density(histogram, time_u='Picoseconds', dist_u='Angstrom', d_time=10, d_dist=0.1):
+def plot_density(histogram, time_u='Picoseconds', dist_u='Angstrom',
+                 d_time=10, d_dist=0.1):
     """
-    Plots density histogram for given 2d array. Array should be of form 'histogram[frame, z_pos]'
+    Plots density histogram for given 2d array. Array should be of form
+    'histogram[frame, z_pos]'
     """
     colors = cm.magma_r
     colors.set_under('white')
 
     plt.figure()
-    plt.imshow(histogram, extent=[0, histogram.shape[1]*d_dist, 0, histogram.shape[0]*d_time],
-               cmap=colors, aspect='auto', origin='lower', vmin=1)
+    plt.imshow(histogram, extent=[0, histogram.shape[1]*d_dist, 0,
+               histogram.shape[0]*d_time], cmap=colors, aspect='auto',
+               origin='lower', vmin=1)
     plt.colorbar()
     plt.xlabel('Z-position ({:s})'.format(dist_u))
     plt.ylabel('Time ({:s})'.format(time_u))
 
 
-def plot_densities(histograms, titles=[], time_u='Picoseconds', dist_u='Angstrom', d_time=10, d_dist=0.1):
+def plot_densities(histograms, titles=[], time_u='Picoseconds',
+                   dist_u='Angstrom', d_time=10, d_dist=0.1):
     """
     Plots multiple density histograms for given list of 2d arrays
     """
