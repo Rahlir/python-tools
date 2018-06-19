@@ -79,23 +79,23 @@ def plot_densities(histograms, titles=[], time_u='Picoseconds',
     colors.set_under('white')
     max_v = max([histogram.max() for histogram in histograms])
     max_plt = len(histograms)
-    
+
     for i, ax in enumerate(axes.flat):
         histogram = histograms[i]
         image = ax.imshow(histogram.T,
                           extent=[0, histogram.shape[0]*d_time, 0, histogram.shape[1]*d_dist],
                           cmap=colors, aspect='auto', origin='lower', vmin=1e-15, vmax=max_v)
-        
+
         if len(titles) > i:
             ax.set_title(titles[i])
-        
+
         if i+1 != max_plt:
             ax.set_xticklabels([])
         else:
             ax.set_xlabel('Time ({:s})'.format(time_u))
 
         ax.set_ylabel('Z-position ({:s})'.format(dist_u))
-            
+
     plt.tight_layout()
 
     fig.subplots_adjust(right=0.8)
