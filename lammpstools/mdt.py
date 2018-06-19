@@ -67,16 +67,8 @@ def msd(traj, n_origs, atoms='all', average=True):
 
 def msd_raw_depreceated(xyz, dt, n_origs, average=True):
     """
-    Calculate MSD for given trajectory. Unlike `msd` function,
-    this function uses xyz array instead of `mdtraj.Trajectory`. Allowing
-    it to be used more flexibly (for instance on center of masses trajectories)
-
-    :param numpy.Array xyz: 3 dimensional array containing positions of objects
-    for which msd is to be calculated
-    :param int dt: Timestep for the given trajectory
-    :param int n_origs: Number of origins to use for the correlation function
-    :return: x axis array and msd array
-    :rtype: tuple -> `numpy.Array` and `numpy.Array`
+    Depreceated. Use `msd_raw` which has parameter for upper limit to spped up
+    computation
     """
     n_frames = xyz.shape[0]
     n_atoms = xyz.shape[1]
