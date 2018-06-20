@@ -65,7 +65,7 @@ def msd(traj, n_origs, atoms='all', average=True):
     return x_axis, result
 
 
-def msd_raw(xyz, dt, n_origs, average=True, upper=None):
+def msd_raw_old(xyz, dt, n_origs, average=True, upper=None):
     """
     Calculate MSD for given trajectory. Unlike `msd` function,
     this function uses xyz array instead of `mdtraj.Trajectory`. Allowing
@@ -105,6 +105,50 @@ def msd_raw(xyz, dt, n_origs, average=True, upper=None):
 
     n_contribs_new = np.tile(n_contribs, (correlation.shape[1], 1)).T
     result = correlation/n_contribs_new
+    x_axis = np.linspace(0, (n_points-1)*dt, n_points)
+
+    if average:
+        return x_axis, np.mean(result, axis=1)
+
+    return x_axis, result
+
+
+def msd_raw(xyz, dt, n_origs, average=True, upper=None):
+    """
+    Calculate MSD for given trajectory. Unlike `msd` function,
+    this function uses xyz array instead of `mdtraj.Trajectory`. Allowing
+    it to be used more flexibly (for instance on center of masses trajectories)
+
+    :param numpy.Array xyz: 3 dimensional array containing positions of objects
+    for which msd is to be calculated
+    :param int dt: Timestep for the given trajectory
+    :param int n_origs: Number of origins to use for the correlation function
+    :return: x axis array and msd array
+    :rtype: tuple -> `numpy.Array` and `numpy.Array`
+    """
+    if upper is None:
+        upper = xyz.shape[0]*dt
+
+    n_points = int(upper/dt)
+    n_frames = xyz.shape[0]
+    n_atoms = xyz.shape[1]
+    n_contribs = np.zeros((n_points, n_atoms), dtype=np.float64)
+    correlation = np.zeros((n_points, n_atoms), dtype=np.float64)
+    origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
+
+    for origin in origins:
+        print('\rCalculating MSD from origin {:.3f} ps'.format(origin*dt),
+              end='', flush=True)
+
+        upper_pt = origin+n_points
+
+        ref = xyz[origin, :, :]
+        msd_contr = ((xyz[origin:upper_pt, :, :] - ref)**2).sum(axis=2)
+
+        n_contribs[:msd_contr.shape[0], :msd_contr.shape[1]] += 1
+        correlation[:msd_contr.shape[0], :msd_contr.shape[1]] += msd_contr
+
+    result = correlation/n_contribs
     x_axis = np.linspace(0, (n_points-1)*dt, n_points)
 
     if average:
