@@ -65,39 +65,6 @@ def msd(traj, n_origs, atoms='all', average=True):
     return x_axis, result
 
 
-def msd_raw_depreceated(xyz, dt, n_origs, average=True):
-    """
-    Depreceated. Use `msd_raw` which has parameter for upper limit to spped up
-    computation
-    """
-    n_frames = xyz.shape[0]
-    n_atoms = xyz.shape[1]
-    n_contribs = np.zeros((n_frames-1,), dtype=np.float64)
-    correlation = np.zeros((n_frames-1, n_atoms), dtype=np.float64)
-    origins = np.linspace(0, n_frames-1, n_origs, dtype=int, endpoint=True)
-    indicies = np.arange(n_atoms)  # For now, we are interested in all atoms
-
-    for origin in origins:
-        print('\rCalculating MSD from origin {:.3f} ps'.format(origin*dt),
-              end='', flush=True)
-        ref = xyz[origin, indicies, :]
-        msd_contr = ((xyz[origin+1:, indicies, :] - ref)**2).sum(axis=2)
-
-        n_contribs[:msd_contr.shape[0]] += 1
-        msd_contr_final = np.zeros((correlation.shape))
-        msd_contr_final[:msd_contr.shape[0], :msd_contr.shape[1]] = msd_contr
-        correlation += msd_contr_final
-
-    n_contribs_new = np.tile(n_contribs, (correlation.shape[1], 1)).T
-    result = correlation/n_contribs_new
-    x_axis = np.linspace(dt, (n_frames-1)*dt, result.shape[0])
-
-    if average:
-        return x_axis, np.mean(result, axis=1)
-
-    return x_axis, result
-
-
 def msd_raw(xyz, dt, n_origs, average=True, upper=None):
     """
     Calculate MSD for given trajectory. Unlike `msd` function,
@@ -159,3 +126,36 @@ def get_coms(traj, mol_elements=['H', 'O'], mol_order=['O', 'H', 'H']):
     weights = [masses[element] for element in mol_order]
 
     return np.average(traj.xyz[:, mols], axis=2, weights=weights)
+
+
+def _msd_raw_depreceated(xyz, dt, n_origs, average=True):
+    """
+    Depreceated. Use `msd_raw` which has parameter for upper limit to spped up
+    computation
+    """
+    n_frames = xyz.shape[0]
+    n_atoms = xyz.shape[1]
+    n_contribs = np.zeros((n_frames-1,), dtype=np.float64)
+    correlation = np.zeros((n_frames-1, n_atoms), dtype=np.float64)
+    origins = np.linspace(0, n_frames-1, n_origs, dtype=int, endpoint=True)
+    indicies = np.arange(n_atoms)  # For now, we are interested in all atoms
+
+    for origin in origins:
+        print('\rCalculating MSD from origin {:.3f} ps'.format(origin*dt),
+              end='', flush=True)
+        ref = xyz[origin, indicies, :]
+        msd_contr = ((xyz[origin+1:, indicies, :] - ref)**2).sum(axis=2)
+
+        n_contribs[:msd_contr.shape[0]] += 1
+        msd_contr_final = np.zeros((correlation.shape))
+        msd_contr_final[:msd_contr.shape[0], :msd_contr.shape[1]] = msd_contr
+        correlation += msd_contr_final
+
+    n_contribs_new = np.tile(n_contribs, (correlation.shape[1], 1)).T
+    result = correlation/n_contribs_new
+    x_axis = np.linspace(dt, (n_frames-1)*dt, result.shape[0])
+
+    if average:
+        return x_axis, np.mean(result, axis=1)
+
+    return x_axis, result
