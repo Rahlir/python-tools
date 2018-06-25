@@ -68,7 +68,7 @@ def stress_acf(tensors, dt, n_origs, upper=None, normalized=True, avg=True):
     correlation = np.zeros((3, n_points), dtype=np.float64)
 
     origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
-    avg = np.mean(tensors, axis=1, keepdims=True)
+#     mean = np.mean(tensors, axis=1, keepdims=True)
     if normalized:
         var = np.var(tensors, axis=1, keepdims=True)
     else:
@@ -85,7 +85,7 @@ def stress_acf(tensors, dt, n_origs, upper=None, normalized=True, avg=True):
             time_0 = time_1
 
         ref = tensors[:, origin, np.newaxis]
-        viscosity_contr = ((tensors[:, origin:upper_pt]-avg)*(ref-avg))/var
+        viscosity_contr = (tensors[:, origin:upper_pt]*ref)/var
 
         n_contribs[:, :viscosity_contr.shape[1]] += 1
         correlation[:viscosity_contr.shape[0],
