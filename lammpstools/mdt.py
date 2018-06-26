@@ -113,7 +113,7 @@ def msd_raw_old(xyz, dt, n_origs, average=True, upper=None):
     return x_axis, result
 
 
-def msd_raw(xyz, dt, n_origs, average=True, upper=None):
+def msd_raw(xyz, dt, n_origs, spacing=None, average=True, upper=None):
     """
     Calculate MSD for given trajectory. Unlike `msd` function,
     this function uses xyz array instead of `mdtraj.Trajectory`. Allowing
@@ -134,6 +134,9 @@ def msd_raw(xyz, dt, n_origs, average=True, upper=None):
     n_atoms = xyz.shape[1]
     n_contribs = np.zeros((n_points, n_atoms), dtype=np.float64)
     correlation = np.zeros((n_points, n_atoms), dtype=np.float64)
+
+    if spacing is not None:
+        n_origs = int(n_frames * dt / spacing)
     origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
 
     for origin in origins:
