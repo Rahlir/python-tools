@@ -39,7 +39,8 @@ def stress_acf_old(tensors, dt, n_origs, upper=None):
     return x_axis, result
 
 
-def stress_acf(tensors, dt, n_origs, upper=None, normalized=True, avg=True):
+def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
+               normalized=True, avg=True):
     """
     Calculate stress autocorrelation function for given 3d array of
     off-diagonal stress tensors
@@ -67,6 +68,8 @@ def stress_acf(tensors, dt, n_origs, upper=None, normalized=True, avg=True):
     n_contribs = np.zeros((3, n_points), dtype=np.float64)
     correlation = np.zeros((3, n_points), dtype=np.float64)
 
+    if spacing is not None:
+        n_origs = int(n_frames * dt / spacing)
     origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
 #     mean = np.mean(tensors, axis=1, keepdims=True)
     if normalized:
