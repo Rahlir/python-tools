@@ -82,7 +82,7 @@ def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
         upper_pt = origin+n_points
         time_1 = tm.time()
         dtime = 1000 * (time_1 - time_0)
-        if dtime > 1.0:
+        if dtime > 1.5:
             print('\rCalculating stress from origin {:.3f} ps'.format(
                 origin*dt), flush=True, end='')
             time_0 = time_1
