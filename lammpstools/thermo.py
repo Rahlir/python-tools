@@ -1,3 +1,5 @@
+"""Module for thermo analysis"""
+
 import copy
 
 import numpy as np
@@ -65,10 +67,10 @@ def plot_thermo(data_all, label_t, label_thermos, label_sims=None,
             axes[row_ax, 0].set_ylabel(
                 '{:s} [{:s}]'.format(therm_two, units.get(therm_two, 'def')))
             if row_ax == rows - 1:
-                    axes[row_ax, 0].set_xlabel(
-                            'Time [{:s}]'.format(units.get(label_t, '')))
-                    axes[row_ax, 1].set_xlabel(
-                            'Time [{:s}]'.format(units.get(label_t, '')))
+                axes[row_ax, 0].set_xlabel(
+                    'Time [{:s}]'.format(units.get(label_t, '')))
+                axes[row_ax, 1].set_xlabel(
+                    'Time [{:s}]'.format(units.get(label_t, '')))
         else:
             axes[row_ax, 1].remove()
             axes[row_ax, 0].set_ylabel(
