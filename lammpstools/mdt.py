@@ -136,12 +136,16 @@ def msd_raw(xyz, dt, n_origs, spacing=None, average=True, upper=None):
     correlation = np.zeros((n_points, n_atoms), dtype=np.float64)
 
     if spacing is not None:
-        n_origs = int(n_frames * dt / spacing)
+        n_origs = int(n_frames / spacing)
     origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
 
+    print_threshold = round(n_origs / 100)
+    i = 0
+
     for origin in origins:
-        print('\rCalculating MSD from origin {:.3f} ps'.format(origin*dt),
-              end='', flush=True)
+        if i % print_threshold == 0:
+            print('\r{: 3d}% calculated'.format(round(i*100/n_origs)),
+                  end='', flush=True)
 
         upper_pt = origin+n_points
 
@@ -150,6 +154,7 @@ def msd_raw(xyz, dt, n_origs, spacing=None, average=True, upper=None):
 
         n_contribs[:msd_contr.shape[0], :msd_contr.shape[1]] += 1
         correlation[:msd_contr.shape[0], :msd_contr.shape[1]] += msd_contr
+        i += 1
 
     result = correlation/n_contribs
     x_axis = np.linspace(0, (n_points-1)*dt, n_points)
@@ -160,7 +165,7 @@ def msd_raw(xyz, dt, n_origs, spacing=None, average=True, upper=None):
     return x_axis, result
 
 
-def get_coms(traj, mol_elements=['H', 'O'], mol_order=['O', 'H', 'H']):
+def get_coms_traj(traj, mol_elements=['H', 'O'], mol_order=['O', 'H', 'H']):
     masses = {}
     for atom in traj.top.atoms:
         sym = atom.element.symbol
@@ -173,6 +178,31 @@ def get_coms(traj, mol_elements=['H', 'O'], mol_order=['O', 'H', 'H']):
     weights = [masses[element] for element in mol_order]
 
     return np.average(traj.xyz[:, mols], axis=2, weights=weights)
+
+
+def get_coms(vectors, masses):
+    """TODO: Homogeneous system
+
+    Parameters
+    ----------
+    vectors : TODO
+    masses : TODO
+
+    Returns
+    -------
+    TODO
+
+    """
+    if vectors.shape[1] % len(masses) != 0:
+        raise ValueError("The {:d} of atoms is not divisible by {:d} masses".format(vectors.shape[1], len(masses)))
+
+    n_mols = int(vectors.shape[1]/len(masses))
+    mol_size = len(masses)
+
+    # TODO explain
+    indeces_mols = np.arange(vectors.shape[1]).reshape(n_mols, mol_size)
+
+    return np.average(vectors[:, indeces_mols], axis=2, weights=masses)
 
 
 def _msd_raw_depreceated(xyz, dt, n_origs, average=True):
