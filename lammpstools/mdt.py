@@ -2,7 +2,7 @@ import numpy as np
 import mdtraj as md
 
 
-def load_traj(trajectory, top):
+def load_traj(trajectory, top, stride=None):
     """
     Load trajectory using `mdtraj.load`
 
@@ -12,7 +12,7 @@ def load_traj(trajectory, top):
     :rtype: mdtraj.Trajectory
     """
     print("Loading trajectories from {:s}".format(trajectory), flush=True)
-    traj = md.load(trajectory, top=top)
+    traj = md.load(trajectory, top=top, stride=stride)
     print("Trajectory loaded", flush=True)
     return traj
 
