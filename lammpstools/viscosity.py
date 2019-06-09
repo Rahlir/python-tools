@@ -39,8 +39,8 @@ def stress_acf_old(tensors, dt, n_origs, upper=None):
     return x_axis, result
 
 
-def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
-               normalized=True, avg=True):
+def stress_acf(tensors, dt, spacing, upper=None,
+               normalized=True, avg=True, extended=False):
     """
     Calculate stress autocorrelation function for given 3d array of
     off-diagonal stress tensors
@@ -48,7 +48,7 @@ def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
     :param `numpy.Array` tensors: 3d array of off-diagonal
     stress tensor entries
     :param int dt: Timestep between two data points
-    :param int n_origs: Number of origins to use for the correlation function
+    :param int spacing: Spacing between origins
     :param float upper: Upper window for the autocorrelation function. If
     not specified then the acf will be calculated with the delay window equal
     to the timelenght of the trajectort
@@ -68,8 +68,7 @@ def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
     n_contribs = np.zeros((3, n_points), dtype=np.float64)
     correlation = np.zeros((3, n_points), dtype=np.float64)
 
-    if spacing is not None:
-        n_origs = int(n_frames * dt / spacing)
+    n_origs = int(n_frames / spacing)
     origins = np.linspace(0, n_frames, n_origs, dtype=int, endpoint=False)
 #     mean = np.mean(tensors, axis=1, keepdims=True)
     if normalized:
@@ -95,9 +94,11 @@ def stress_acf(tensors, dt, n_origs, spacing=None, upper=None,
                     :viscosity_contr.shape[1]] += viscosity_contr
 
     result = correlation/n_contribs
-    x_axis = np.linspace(0, n_points*dt-1, n_points)
 
     if avg:
-        return x_axis, np.mean(result, axis=0)
+        return np.mean(result, axis=0)
 
-    return x_axis, result
+    if extended:
+        return correlation, n_contribs, result
+
+    return result
