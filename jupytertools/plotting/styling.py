@@ -64,11 +64,10 @@ def get_style_func(style_name):
     """
     try:
         function_name = "{:s}_style".format(style_name)
-        func = locals()[function_name]
+        func_obj = globals()[function_name]
+        return func_obj
     except KeyError:
         raise KeyError("The style with the name: {:s} doesn't exist".format(style_name))
-
-    func()
 
 
 def gruvbox_style():
