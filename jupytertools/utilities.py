@@ -8,23 +8,69 @@ __all__ = ['save_to_shelve', 'save_dict_to_shelve', 'retrieve_from_shelve', 'ret
            'print_content_of_shelve']
 
 
-def save_to_shelve(file_name, key, value):
-    with shelve.open(join('shelve', file_name), protocol=4) as database:
+def save_to_shelve(filename, key, value):
+    """Save the key and value pair into shelve file with
+    given name. This function assumes that the working directory
+    contains folder `shelve` where the shelve files are stored.
+
+    Parameters
+    ----------
+    filename : name of the shelve file to be updated or created
+    key : key of the value used when retrieving the value from shelve
+    value : the object to be stored to the shelve file
+    """
+    with shelve.open(join('shelve', filename), protocol=4) as database:
         database[key] = value
 
 
-def save_dict_to_shelve(file_name, dictionary):
-    with shelve.open(join('shelve', file_name), protocol=4) as database:
+def save_dict_to_shelve(filename, dictionary):
+    """Save the entire dictionary to disk as a shelve file.
+    This function assumes that the working directory
+    contains folder `shelve` where the shelve files are stored.
+
+    Parameters
+    ----------
+    filename : name of the shelve file to be updated or created
+    dictionary : dictionary to be stored to the file with given name
+    """
+    with shelve.open(join('shelve', filename), protocol=4) as database:
         database.update(dictionary)
 
 
-def retrieve_from_shelve(file_name, key):
-    with shelve.open(join('shelve', file_name)) as database:
+def retrieve_from_shelve(filename, key):
+    """Retrieve the object stored in the file with given key.
+    This function assumes that the working directory
+    contains folder `shelve` where the shelve files are stored.
+
+    Parameters
+    ----------
+    filename : name of the shelve file where the object is stored
+    key : key of the object stored in the shelve file
+
+    Returns
+    -------
+    stored_object: python object stored in the given file under the
+        specified key
+    """
+    with shelve.open(join('shelve', filename)) as database:
         return database[key]
 
 
-def retrieve_dict_from_shelve(file_name):
-    with shelve.open(join('shelve', file_name)) as database:
+def retrieve_dict_from_shelve(filename):
+    """Retrieve an entire dictionary saved as a shelve file.
+    This function assumes that the working directory
+    contains folder `shelve` where the shelve files are stored.
+
+    Parameters
+    ----------
+    filename : name of the shelve file
+
+    Returns
+    -------
+    result_dict: dictionary of key value pairs saved on the disk
+        as a shelve file
+    """
+    with shelve.open(join('shelve', filename)) as database:
         result_dict = {}
         for key, value in database.items():
             result_dict[key] = value
@@ -32,6 +78,14 @@ def retrieve_dict_from_shelve(file_name):
 
 
 def print_content_of_shelve(filename):
+    """Print all keys of a given shelve file.
+    This function assumes that the working directory
+    contains folder `shelve` where the shelve files are stored.
+
+    Parameters
+    ----------
+    filename : name of the shelve file
+    """
     print("Keys in file `{:s}`:".format(filename))
     with shelve.open("shelve/{:s}".format(filename), protocol=4) as database:
         name_list = list(database.keys())

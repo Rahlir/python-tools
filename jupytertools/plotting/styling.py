@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 from jupyterthemes import jtplot
 
-__all__ = ['gruvbox_style', 'seaborn_style', 'default_style', 'minor_grid_color',
-           'current_style', 'folder_to_save', 'save_to_disk']
+__all__ = ['set_default_style', 'set_figsize', 'get_style_func', 'gruvbox_style', 'seaborn_style', 'default_style',
+           'minor_grid_color', 'current_style', 'folder_to_save', 'save_to_disk']
 
 
 class PlottingStyle:
@@ -16,12 +16,65 @@ class PlottingStyle:
         self.current_style = ''
         self.minor_grid_color = mpl.rcParams["grid.color"]
         self.folder_to_save = "figures"
+        self.figsize = (17.5, 13.0)
 
 
 style = PlottingStyle("gruvbox")
 
 
+def set_default_style(style_name, set_as_current=True):
+    """Set style with the given name as the default style. Currently,
+    there are two styles available: 'gruvbox' and 'seaborn'
+
+    Parameters
+    ----------
+    style_name : string containing the style to be used as default
+    set_as_current: set the given default style as the current style.
+        Default is `True`, optional
+    """
+    style.default_style = style_name
+    if set_as_current:
+        default_style()
+
+
+def set_figsize(width, height):
+    """Set new size for figures in px. Default is 17.5 x 13.0
+
+    Parameters
+    ----------
+    width : new width of figures in px
+    height : new height of figures in px
+    """
+    style.figsize = (width, height)
+    func = get_style_func(current_style())
+    func()
+
+
+def get_style_func(style_name):
+    """Get function that sets the style with given name
+
+    Parameters
+    ----------
+    style_name : name of the style
+
+    Returns
+    -------
+    func: function that sets the style of the given name
+
+    """
+    try:
+        function_name = "{:s}_style".format(style_name)
+        func = locals()[function_name]
+    except KeyError:
+        raise KeyError("The style with the name: {:s} doesn't exist".format(style_name))
+
+    func()
+
+
 def gruvbox_style():
+    """Set the current plotting style to gruvbox with higher contrast
+    pallete
+    """
     higher_constrast_pallete = [
         '#3572C6',
         '#83a83b',
@@ -49,7 +102,7 @@ def gruvbox_style():
     ]
     higher_contrast_cycler = cycler.cycler("color", higher_constrast_pallete)
 
-    jtplot.style(theme='gruvboxd', context='notebook', figsize=(17.5, 13.0))
+    jtplot.style(theme='gruvboxd', context='notebook', figsize=style.figsize)
     mpl.rcParams["axes.prop_cycle"] = higher_contrast_cycler
     mpl.rcParams["axes.axisbelow"] = True
     style.minor_grid_color = "#32302f"
@@ -57,7 +110,13 @@ def gruvbox_style():
 
 
 def seaborn_style(pallete=None):
-    sb.set(style='darkgrid', rc={'figure.figsize': [17.5, 13.0]})
+    """Set the current plotting style to seaborn
+
+    Parameters
+    ----------
+    pallete : pallete of the seaborn style, optional
+    """
+    sb.set(style='darkgrid', rc={'figure.figsize': [*style.figsize]})
     if pallete is not None:
         sb.set_palette(pallete)
     style.minor_grid_color = "#f4f4f8"
@@ -65,6 +124,7 @@ def seaborn_style(pallete=None):
 
 
 def default_style():
+    """Set the default style as the current style"""
     if style.default_style == 'seaborn':
         seaborn_style()
     elif style.default_style == 'gruvbox':
@@ -74,20 +134,53 @@ def default_style():
 
 
 def minor_grid_color():
+    """Return the color of the minor grid for the current plotting style
+
+    Returns
+    -------
+    minor_grid_color: hex value of the minor grid color for the current style
+    """
     return style.minor_grid_color
 
 
 def current_style():
+    """Return the name of the current plotting style
+
+    Returns
+    -------
+    current_style: name of the current plotting style
+    """
     return style.current_style
 
 
 def folder_to_save(fname=None):
-    if fname is None:
-        return style.folder_to_save
-    style.folder_to_save = fname
+    """Set the folder to be used for saving figures. If no argument is given,
+    then the current folder used for saving figures is returned.
+
+    Parameters
+    ----------
+    fname : folder name where figures should be saved, optional
+
+    Returns
+    -------
+    fname : name of the folder where figures are currently stored
+    """
+    if fname is not None:
+        style.folder_to_save = fname
+    return style.folder_to_save
 
 
 def save_to_disk(fname, dpi=None, format='png'):
+    """Save the current figure to disk
+
+    Parameters
+    ----------
+    fname : name of the file for the saved figure
+    dpi : dpi of the saved figure, when not specified, dpi is calculated to optimize
+        for 4K monitors, optional
+    format : format for the saved figure, such as 'png', 'pdf', etc. Default is 'png',
+        optional
+    """
     if dpi is None:
         x, y = mpl.rcParams["figure.figsize"]
         dpi = max(4096.0/x, 2160.0/y)
