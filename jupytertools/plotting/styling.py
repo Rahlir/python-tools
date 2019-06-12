@@ -7,7 +7,8 @@ import seaborn as sb
 from jupyterthemes import jtplot
 
 __all__ = ['set_default_style', 'set_figsize', 'get_style_func', 'gruvbox_style', 'seaborn_style', 'default_style',
-           'minor_grid_color', 'current_style', 'folder_to_save', 'save_to_disk']
+           'minor_grid_color', 'current_style', 'folder_to_save', 'current_color_array', 'plot_current_color_cycle',
+           'save_to_disk']
 
 
 class PlottingStyle:
@@ -196,6 +197,23 @@ def save_to_disk(fname, dpi=None, format='png'):
 
     plt.savefig('{:s}/{:s}.{:s}'.format(prefix, fname, format), dpi=dpi,
                 facecolor=facecolor, edgecolor=edgecolor, format=format)
+
+
+def current_color_array():
+    """Return array of colors currently used for plotting
+    Returns
+    -------
+    colors : array of hex values of colors used in the current color cycle for plotting
+
+    """
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    return prop_cycle.by_key()['color']
+
+
+def plot_current_color_cycle():
+    """Plots color cycle currently in use"""
+    colors = current_color_array()
+    sb.palplot(colors)
 
 
 if __name__ != "__main__":
