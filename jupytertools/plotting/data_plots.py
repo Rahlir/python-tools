@@ -1,7 +1,7 @@
 """Useful functions for generic plots of data"""
 
 import matplotlib.pyplot as plt
-from .styling import seaborn_style, save_to_disk, default_style
+from .styling import save_to_disk
 
 
 __all__ = ['plot_all']
@@ -10,9 +10,7 @@ __all__ = ['plot_all']
 def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_label='', y_label='',
              title='', filename=None, save=False, **kwargs):
     if save:
-        if filename is not None:
-            seaborn_style()
-        else:
+        if filename is None:
             print("To save, you must specify file name")
             save = False
 
@@ -46,6 +44,5 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
 
     plt.tight_layout()
 
-    if save:
+    if save and filename is not None:
         save_to_disk(filename)
-        default_style()
