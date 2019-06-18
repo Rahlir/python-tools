@@ -25,8 +25,12 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
         sorted_name_list = name_list
 
     for name in sorted_name_list:
-        x, y = dictionary[name]
-        plt.plot(x, y, label=name)
+        try:
+            x, y = dictionary[name]
+            plt.plot(x, y, label=name)
+        except ValueError:
+            y = dictionary[name]
+            plt.plot(y, label=name)
 
     for func_name, argument in kwargs.items():
         func = getattr(plt, func_name)
