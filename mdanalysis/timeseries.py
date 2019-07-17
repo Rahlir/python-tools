@@ -41,7 +41,7 @@ def get_time_axis_like(y_axis, dt):
     return get_time_axis(y_axis.shape[0], dt)
 
 
-def integrate_series(series, time_axis, const, weights=None):
+def integrate_series(series, time_axis=None, const=1, dt=1, weights=None):
     """Integrate series using integrate.cumtrapz. Weights for the integral can be used
 
     Parameters
@@ -61,6 +61,9 @@ def integrate_series(series, time_axis, const, weights=None):
     elif weights.shape != series.shape:
         error_msg_format = "The weights with shape {} are not compatible with the series of shape {}"
         raise ValueError(error_msg_format.format(weights.shape, series.shape))
+
+    if time_axis is None:
+        time_axis = get_time_axis_like(series, dt)
 
     integrand = const*series
     return integrate.cumtrapz(integrand*weights, time_axis, initial=0)
