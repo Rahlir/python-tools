@@ -2,13 +2,14 @@
 
 import matplotlib.pyplot as plt
 from .styling import save_to_disk
+from mdanalysis import get_time_axis_like
 
 
 __all__ = ['plot_all']
 
 
 def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_label='', y_label='',
-             title='', filename=None, save=False, **kwargs):
+             title='', dt=1, filename=None, save=False, **kwargs):
     if save:
         if filename is None:
             print("To save, you must specify file name")
@@ -30,7 +31,8 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
             plt.plot(x, y, label=name)
         except ValueError:
             y = dictionary[name]
-            plt.plot(y, label=name)
+            x = get_time_axis_like(y, dt)
+            plt.plot(x, y, label=name)
 
     for func_name, argument in kwargs.items():
         func = getattr(plt, func_name)
