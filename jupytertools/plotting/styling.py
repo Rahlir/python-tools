@@ -17,7 +17,7 @@ class PlottingStyle:
         self.current_style = ''
         self.minor_grid_color = mpl.rcParams["grid.color"]
         self.folder_to_save = "figures"
-        self.figsize = (17.5, 13.0)
+        self.figsize = mpl.rcParams["figure.figsize"]
 
 
 style = PlottingStyle("gruvbox")
@@ -71,39 +71,63 @@ def get_style_func(style_name):
         raise KeyError("The style with the name: {:s} doesn't exist".format(style_name))
 
 
-def gruvbox_style():
+def gruvbox_style(pallete="higher_contrast"):
     """Set the current plotting style to gruvbox with higher contrast
     pallete
     """
-    higher_constrast_pallete = [
-        '#3572C6',
-        '#83a83b',
-        '#c44e52',
-        '#a89984',
-        '#8172b2',
-        '#b57614',
-        '#8ec07c',
-        '#ff711a',
-        '#d3869b',
-        '#6C7A89',
-        '#77BEDB',
-        '#4168B7',
-        '#27ae60',
-        '#e74c3c',
-        '#ff914d',
-        '#bc89e0',
-        '#3498db',
-        '#fabd2f',
-        '#fb4934',
-        '#b16286',
-        '#83a598',
-        '#fe8019',
-        '#b8bb26'
-    ]
-    higher_contrast_cycler = cycler.cycler("color", higher_constrast_pallete)
+    palletes = {
+        "higher_contrast": [
+            '#3572C6',
+            '#83a83b',
+            '#c44e52',
+            '#d5c4a1',
+            '#8172b2',
+            '#b57614',
+            '#8ec07c',
+            '#ff711a',
+            '#d3869b',
+            '#6C7A89',
+            '#77BEDB',
+            '#4168B7',
+            '#27ae60',
+            '#e74c3c',
+            '#ff914d',
+            '#bc89e0',
+            '#3498db',
+            '#fabd2f',
+            '#fb4934',
+            '#b16286',
+            '#83a598',
+            '#fe8019',
+            '#b8bb26',
+            '#a89984'
+        ],
+        "bright": [
+            '#77BEDB',
+            '#fb4934',
+            '#8ec07c',
+            '#ff914d',
+            '#bc89e0',
+            '#fabd2f',
+            '#fbf1c7',
+            '#3498db'
+        ],
+        "paired": [
+            '#77BEDB',
+            '#4168B7',
+            '#8ec07c',
+            '#b8bb26',
+            '#d3869b',
+            '#fb4934',
+            '#bdae93',
+            '#ebdbb2'
+        ]
+    }
+
+    new_cycler = cycler.cycler("color", palletes[pallete])
 
     jtplot.style(theme='gruvboxd', context='notebook', figsize=style.figsize)
-    mpl.rcParams["axes.prop_cycle"] = higher_contrast_cycler
+    mpl.rcParams["axes.prop_cycle"] = new_cycler
     mpl.rcParams["axes.axisbelow"] = True
     style.minor_grid_color = "#32302f"
     style.current_style = "gruvbox"
@@ -118,7 +142,7 @@ def seaborn_style(pallete=None):
     """
     sb.set(style='darkgrid', rc={'figure.figsize': [*style.figsize]})
     if pallete is not None:
-        sb.set_palette(pallete)
+        sb.set_palette(pallete, 12)
     style.minor_grid_color = "#f4f4f8"
     style.current_style = "seaborn"
 
@@ -214,7 +238,3 @@ def plot_current_color_cycle():
     """Plots color cycle currently in use"""
     colors = current_color_array()
     sb.palplot(colors)
-
-
-if __name__ != "__main__":
-    default_style()
