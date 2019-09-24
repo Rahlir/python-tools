@@ -9,7 +9,7 @@ __all__ = ['plot_all']
 
 
 def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_label='', y_label='',
-             title='', dt=1, filename=None, save=False, **kwargs):
+             title='', dt=1, style=None, filename=None, save=False, **kwargs):
     if save:
         if filename is None:
             print("To save, you must specify file name")
@@ -25,14 +25,17 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
     else:
         sorted_name_list = name_list
 
+    if style is None:
+        style = {}
+
     for name in sorted_name_list:
         try:
             x, y = dictionary[name]
-            plt.plot(x, y, label=name)
+            plt.plot(x, y, label=name, **style)
         except ValueError:
             y = dictionary[name]
             x = get_time_axis_like(y, dt)
-            plt.plot(x, y, label=name)
+            plt.plot(x, y, label=name, **style)
 
     for func_name, argument in kwargs.items():
         func = getattr(plt, func_name)
