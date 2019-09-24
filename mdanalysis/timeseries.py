@@ -3,8 +3,49 @@
 import numpy as np
 from scipy import integrate
 
+from jupytertools import retrieve_from_shelve
 
-__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series']
+
+__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf', 'pack_cfs', 'CorrelationFunction']
+
+
+class CorrelationFunction:
+    def __init__(self, cf_value, label):
+        self.label = label
+        if len(cf_value.shape) == 1:
+            cf_value = cf_value[None, ...]
+        self.cf_var = cf_value
+
+    @property
+    def average_cf(self):
+        if hasattr(self, 'average_cf_var'):
+            return self.average_cf_var
+
+        self.average_cf_var = self.cf_var.mean(axis=0)
+        return self.average_cf_var
+
+
+def load_cf(filename, key, foldername='shelve', label=None):
+    if not label:
+        label = f"{filename:s} {key:s}".replace("_", " ")
+
+    cf_value = retrieve_from_shelve(filename, key, foldername)
+    return CorrelationFunction(cf_value, label)
+
+
+def pack_cfs(*cfs):
+    cf_dictionary = {}
+    for cf in cfs:
+        dict_key = cf.label
+
+        count = 1
+        while dict_key in cf_dictionary:
+            dict_key = f"{dict_key:s} {count:d}"
+            count += 1
+
+        cf_dictionary[dict_key] = cf
+
+    return cf_dictionary
 
 
 def get_time_axis(n_frames, dt):
