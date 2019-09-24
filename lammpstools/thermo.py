@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_thermo(data_all, label_t, label_thermos, label_sims=None,
-                xlim=None, units={}):
+                xlim=None, units={}, return_val=False):
     if label_sims is None:
         label_sims = list(data_all.keys())
 
@@ -18,8 +18,7 @@ def plot_thermo(data_all, label_t, label_thermos, label_sims=None,
         xmax = xlim[1]
         for label_sim in label_sims:
             time_data = data_all[label_sim][label_t]
-            indicies[label_sim] = np.where((time_data >= xmin)
-                                           & (time_data <= xmax))
+            indicies[label_sim] = np.where((time_data >= xmin) & (time_data <= xmax))
     else:
         for label_sim in label_sims:
             time_data = data_all[label_sim][label_t]
@@ -29,8 +28,8 @@ def plot_thermo(data_all, label_t, label_thermos, label_sims=None,
     rows = int(n_plt/2) + n_plt % 2
 
     fig_height = int(4.5*rows)
-    fig, axes = plt.subplots(rows, 2, figsize=(13, fig_height),
-                             sharex=True, squeeze=False)
+    fig, axes = plt.subplots(rows, 2, figsize=(17.5, fig_height),
+                             sharex=True, squeeze=False, dpi=90)
     # If odd number of plots, first row should have only one plot
     first_empty = (n_plt % 2) > 0
     for row in range(rows):
@@ -77,7 +76,8 @@ def plot_thermo(data_all, label_t, label_thermos, label_sims=None,
                 '{:s} [{:s}]'.format(therm_one, units.get(therm_one, 'def')))
 
     plt.tight_layout()
-    return axes, fig
+    if return_val:
+        return axes, fig
 
 
 def normalize(data, size, extra_kw=[]):
