@@ -5,7 +5,7 @@ from .styling import save_to_disk
 from mdanalysis import get_time_axis_like
 
 
-__all__ = ['plot_all']
+__all__ = ['plot_all', 'plot_cfs']
 
 
 def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_label='', y_label='',
