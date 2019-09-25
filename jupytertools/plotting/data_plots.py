@@ -55,3 +55,34 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
 
     if save and filename is not None:
         save_to_disk(filename)
+
+
+def plot_cfs(dictionary, keys_sorted=True, xlim=None, ylim=None, xlabel='', ylabel='', style=None,
+             legend=True, title='', filename=None):
+    if keys_sorted:
+        name_list = sorted(dictionary.keys)
+    else:
+        name_list = dictionary.keys
+
+    if not style:
+        style = {}
+
+    for name in name_list:
+        cff = dictionary[name]
+        y = cff.average_cf
+        x = get_time_axis_like(y, cff.dt)
+        plt.plot(x, y, label=name, **style)
+
+    if legend:
+        plt.legend()
+
+    plt.xlim(xlim)
+    plt.ylim(ylim)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+
+    plt.tight_layout()
+
+    if filename:
+        save_to_disk(filename)
