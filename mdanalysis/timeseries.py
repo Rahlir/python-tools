@@ -10,8 +10,10 @@ __all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf',
 
 
 class CorrelationFunction:
-    def __init__(self, cf_value, label):
+    def __init__(self, cf_value, label, dt=1):
         self.label = label
+        self.dt = dt
+
         if len(cf_value.shape) == 1:
             cf_value = cf_value[None, ...]
         self.cf_var = cf_value
