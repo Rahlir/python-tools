@@ -60,9 +60,9 @@ def plot_all(dictionary, keys_sorted=True, keys=None, xlim=None, ylim=None, x_la
 def plot_cfs(dictionary, keys_sorted=True, xlim=None, ylim=None, xlabel='', ylabel='', style=None,
              legend=True, title='', filename=None):
     if keys_sorted:
-        name_list = sorted(dictionary.keys)
+        name_list = sorted(dictionary.keys())
     else:
-        name_list = dictionary.keys
+        name_list = dictionary.keys()
 
     if not style:
         style = {}
