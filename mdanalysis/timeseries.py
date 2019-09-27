@@ -2,11 +2,53 @@
 
 import numpy as np
 from scipy import integrate
+from collections.abc import MutableMapping
 
 from jupytertools import retrieve_from_shelve
 
 
-__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf', 'pack_cfs', 'CorrelationFunction']
+__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf', 'pack_cfs',
+           'CorrelationFunction', 'CorrelationFunctions']
+
+
+class CorrelationFunctions(MutableMapping):
+    def __init__(self, data=()):
+        self.cfs = {}
+        self.update(data)
+
+    def __getitem__(self, key):
+        return self.cfs[key]
+
+    def __delitem__(self, key):
+        del self.cfs[key]
+
+    def __setitem__(self, key, cf):
+        if key != cf.label:
+            raise ValueError(f"Passed key {key:s} is not the same as the label of the cf object {cf.label:s}")
+        self.cfs[key] = cf
+
+    def __iter__(self):
+        return iter(self.cfs)
+
+    def __len__(self):
+        return len(self.cfs)
+
+    def __repr__(self):
+        repr = f"{type(self).__name__}("
+        for cf_obj in self.cfs.values():
+            repr += f"\n{cf_obj.to_string_short()};"
+
+        repr += ")"
+        return repr
+
+    def __mul__(self, other):
+        if type(other) is not int or type(other) is not float:
+            raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
+        for cf_object in self.cfs.values():
+            cf_object.cf_var *= other
+
+    def add(self, cf):
+        self[cf.label] = cf
 
 
 class CorrelationFunction:
@@ -17,6 +59,18 @@ class CorrelationFunction:
         if len(cf_value.shape) == 1:
             cf_value = cf_value[None, ...]
         self.cf_var = cf_value
+
+    def __repr__(self):
+        prefix = f"{type(self).__name__}('{self.label}': "
+        suffix = f", dt={self.dt})"
+        cf_repr = np.array2string(self.cf_var, edgeitems=2, prefix=prefix, suffix=suffix)
+        return f"{prefix}{cf_repr}{suffix}"
+
+    def to_string_short(self):
+        prefix = f"'{self.label}': "
+        suffix = f", dt={self.dt}"
+        cf_repr = np.array2string(self.cf_var, edgeitems=2, prefix=prefix, suffix=suffix)
+        return f"{prefix}{cf_repr}{suffix}"
 
     @property
     def average_cf(self):
