@@ -2,12 +2,13 @@
 
 import numpy as np
 from scipy import integrate
+from copy import deepcopy
 from collections.abc import MutableMapping
 
 from jupytertools import retrieve_from_shelve
 
 
-__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf', 'pack_cfs',
+__all__ = ['get_time_axis', 'get_time_axis_like', 'integrate_series', 'load_cf',
            'CorrelationFunction', 'CorrelationFunctions']
 
 
@@ -42,13 +43,27 @@ class CorrelationFunctions(MutableMapping):
         return repr
 
     def __mul__(self, other):
-        if type(other) is not int or type(other) is not float:
+        if type(other) not in [int, float]:
             raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
-        for cf_object in self.cfs.values():
-            cf_object.cf_var *= other
+        new_cfs = deepcopy(self)
+        for label in new_cfs:
+            new_cfs[label] *= other
+        return new_cfs
+
+    def __truediv__(self, other):
+        if type(other) not in [int, float]:
+            raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
+        new_cfs = deepcopy(self)
+        for label in new_cfs:
+            new_cfs[label] /= other
+        return new_cfs
 
     def add(self, cf):
         self[cf.label] = cf
+
+    def dt(self, dt):
+        for cf_obj in self.cfs.values():
+            cf_obj.dt = dt
 
 
 class CorrelationFunction:
@@ -65,6 +80,22 @@ class CorrelationFunction:
         suffix = f", dt={self.dt})"
         cf_repr = np.array2string(self.cf_var, edgeitems=2, prefix=prefix, suffix=suffix)
         return f"{prefix}{cf_repr}{suffix}"
+
+    def __mul__(self, other):
+        if type(other) not in [int, float]:
+            raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
+
+        new_cf = deepcopy(self)
+        new_cf.cf_var *= other
+        return new_cf
+
+    def __truediv__(self, other):
+        if type(other) not in [int, float]:
+            raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
+
+        new_cf = deepcopy(self)
+        new_cf.cf_var /= other
+        return new_cf
 
     def to_string_short(self):
         prefix = f"'{self.label}': "
@@ -87,21 +118,6 @@ def load_cf(filename, key, foldername='shelve', label=None):
 
     cf_value = retrieve_from_shelve(filename, key, foldername)
     return CorrelationFunction(cf_value, label)
-
-
-def pack_cfs(*cfs):
-    cf_dictionary = {}
-    for cf in cfs:
-        dict_key = cf.label
-
-        count = 1
-        while dict_key in cf_dictionary:
-            dict_key = f"{dict_key:s} {count:d}"
-            count += 1
-
-        cf_dictionary[dict_key] = cf
-
-    return cf_dictionary
 
 
 def get_time_axis(n_frames, dt):
