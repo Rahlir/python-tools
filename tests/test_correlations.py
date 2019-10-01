@@ -77,3 +77,21 @@ def test_cf_division():
     correct_result = cf.cf_var / scale
 
     assert (correct_result == cf_new.cf_var).all()
+
+
+def test_cf_multiplication_average():
+    cf_var = np.random.random((100, 1000))
+    cf = md.CorrelationFunction(cf_var, "cf")
+
+    original_avg = cf.average_cf
+
+    scale = np.random.random()
+
+    cf_new = cf * scale
+
+    new_avg = cf_new.average_cf
+
+    correct_32f = np.array(original_avg*scale, dtype=np.float32)
+    tested_32f = np.array(new_avg, dtype=np.float32)
+
+    assert (correct_32f == tested_32f).all()

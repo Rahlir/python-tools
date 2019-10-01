@@ -86,6 +86,9 @@ class CorrelationFunction:
             raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
 
         new_cf = deepcopy(self)
+        if hasattr(self, 'average_cf_var'):
+            del new_cf.average_cf_var
+
         new_cf.cf_var *= other
         return new_cf
 
@@ -94,6 +97,9 @@ class CorrelationFunction:
             raise TypeError(f"unsupported operand type(s) for *: {type(self).__name__} and {type(other).__name__}")
 
         new_cf = deepcopy(self)
+        if hasattr(self, 'average_cf_var'):
+            del new_cf.average_cf_var
+
         new_cf.cf_var /= other
         return new_cf
 
